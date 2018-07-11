@@ -8,6 +8,7 @@ const (
 	STATUS_SYNCHRONIZING = "SYNCHRONIZING"
 	STATUS_PENDING       = "PENDING"
 	STATUS_OK            = "OK"
+	STATUS_DELETED       = "DELETED"
 )
 
 type hrefData struct {
@@ -19,10 +20,10 @@ type linkData struct {
 }
 
 type commonPostResponse struct {
-	Links  linkData `json:"_links,omitempty"`
-	ID     int      `json:"ID,omitempty"`
-	Name   string   `json:"name,omitempty"`
-	Status string   `json:"_status,omitempty"`
+	Links  linkData 			`json:"_links,omitempty"`
+	ID     int      			`json:"ID,omitempty"`
+	Name   string   			`json:"name,omitempty"`
+	Status map[string]string   	`json:"status,omitempty"`
 }
 
 func (c commonPostResponse) FullId() string {
@@ -33,25 +34,23 @@ func (c commonPostResponse) GetName() string {
 	return c.Name
 }
 
-type BackendPoolProperties struct {
-	HcPath       string `json:"hcPath"`
-	HcBody       string `json:"hcBody"`
-	HcStatusCode string `json:"hcStatusCode"`
-}
-
 type Target struct {
 	commonPostResponse
-	Project     string `json:"project"`
-	Environment string `json:"environment"`
-	BackendPool string `json:"parent,omitempty"`
+	BackendPool string `json:"pool,omitempty"`
+}
+
+type BackendPoolHealthCheck struct {
+	HcPath       		string	`json:"hcPath,omitempty"`
+	HcBody       		string	`json:"hcBody,omitempty"`
+	HcHttpStatusCode 	string	`json:"hcHttpStatusCode,omitempty"`
 }
 
 type Pool struct {
 	commonPostResponse
-	Project       string                `json:"project"`
-	Environment   string                `json:"environment"`
-	BalancePolicy string                `json:"balancePolicy"`
-	Properties    BackendPoolProperties `json:"properties,omitempty"`
+	Project       		string	`json:"project"`
+	Environment   		string	`json:"environment"`
+	BalancePolicy 		string	`json:"balancepolicy"`
+	BackendPoolHealthCheck
 }
 
 type RuleProperties struct {
@@ -60,15 +59,21 @@ type RuleProperties struct {
 
 type Rule struct {
 	commonPostResponse
-	RuleType    string         `json:"ruleType,omitempty"`
-	BackendPool string         `json:"pool,omitempty"`
-	Default     bool           `json:"default,omitempty"`
-	Order       int            `json:"order,omitempty"`
-	Properties  RuleProperties `json:"properties,omitempty"`
+	BackendPool []string       `json:"pools,omitempty"`
+	Matching	string         `json:"matching,omitempty"`
+	Project     string         `json:"project"`
+}
+
+type RuleOrdered struct {
+	VirtualHostGroup	string	`json:"virtualhostgroup"`
+	Environment   		string  `json:"environment"`
+	Rule				string  `json:"rule"`
+	Order 				string  `json:"order"`
 }
 
 type VirtualHost struct {
 	commonPostResponse
-	Environment string `json:"environment,omitempty"`
-	Project     string `json:"project,omitempty"`
+	Environment      []string `json:"environments,omitempty"`
+	Project          string   `json:"project,omitempty"`
+	VirtualHostGroup string   `json:"virtualhostgroup,omitempty"`
 }

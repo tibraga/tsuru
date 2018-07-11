@@ -191,13 +191,8 @@ func (s *S) TestGalebAddRuleToID(c *check.C) {
 	s.handler.RspCode = http.StatusCreated
 	expected := Rule{
 		commonPostResponse: commonPostResponse{ID: 0, Name: "myrule"},
-		RuleType:           "ruletype1",
 		BackendPool:        "http://galeb.somewhere/api/target/9",
-		Default:            true,
-		Order:              0,
-		Properties: RuleProperties{
-			Match: "/",
-		},
+		Matching:			"/",
 	}
 	fullId, err := s.client.AddRuleToID("myrule", "http://galeb.somewhere/api/target/9")
 	c.Assert(err, check.IsNil)
