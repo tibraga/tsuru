@@ -2,4 +2,7 @@ FROM alpine:3.4
 ADD build/tsurud /bin/tsurud
 ADD /etc/tsuru-compose.conf /etc/tsuru/tsuru.conf
 EXPOSE 8080
+COPY docker-entrypoint.sh /
+RUN ["chmod", "+x", "/docker-entrypoint.sh"]
+RUN ["sh", "/docker-entrypoint.sh"]
 ENTRYPOINT ["/bin/tsurud", "api"]
