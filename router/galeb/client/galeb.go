@@ -324,7 +324,7 @@ func (c *GalebClient) SetRuleVirtualHost(ruleName, virtualHostName string) error
 
 func (c *GalebClient) RemoveBackendByID(backendID string) error {
 	backend, err := c.removeResource(backendID)
-	if (err != nil) {
+	if err != nil {
 		return nil
 	}
 	err = c.waitStatusOK(backend)
@@ -510,7 +510,7 @@ func (c *GalebClient) removeResource(resourceURI string) (string, error) {
 	}
 	defer rsp.Body.Close()
 	responseData, _ := ioutil.ReadAll(rsp.Body)
-	//Aqui terá que ficar verificando se o status do quarentena está ok
+
 	if rsp.StatusCode != http.StatusNoContent {
 		return "", errors.Errorf("DELETE %s: invalid response code: %d: %s", path, rsp.StatusCode, string(responseData))
 	}
