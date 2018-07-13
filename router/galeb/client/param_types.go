@@ -71,6 +71,10 @@ type RuleOrdered struct {
 	Order 				string  `json:"order"`
 }
 
+type VirtualHostGroup struct {
+	commonPostResponse
+}
+
 type VirtualHost struct {
 	commonPostResponse
 	Environment      []string `json:"environments,omitempty"`

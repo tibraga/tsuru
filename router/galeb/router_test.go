@@ -67,6 +67,7 @@ func NewFakeGalebServer() (*fakeGalebServer, error) {
 	r.HandleFunc("/api/rule/{id}/parents", server.findVirtualhostByRule).Methods("GET")
 	r.HandleFunc("/api/rule/{id}/parents/{vhid}", server.destroyRuleVirtualhost).Methods("DELETE")
 	r.HandleFunc("/api/target/search/findByParentName", server.findTargetsByParent).Methods("GET")
+	r.HandleFunc("/api/virtualhost/{id}/virtualhostgroup", server.findVirtualhostGroupByVirtualHost).Methods("GET")
 	server.router = r
 	return server, nil
 }
@@ -115,6 +116,21 @@ func (s *fakeGalebServer) findItemByName(itemName string, wantedName string) []i
 		}
 	}
 	return ret
+}
+
+func (s *fakeGalebServer) findVirtualhostGroupByVirtualHost(w http.ResponseWriter, r *http.Request) {
+	virtualhostId := r.URL.Query().Get("id")
+	var virtualhost *galebClient.VirtualHost
+	var ret []interface{}
+	for _, item := range s.virtualhosts {
+		v := item.(*galebClient.VirtualHost)
+		vid, _ := strconv.Atoi(virtualhostId)
+		if v.ID == vid {
+			virtualhost = v
+		}
+	}
+
+	json.NewEncoder(w).Encode(virtualhost.VirtualHostGroup)
 }
 
 func (s *fakeGalebServer) findTargetsByParent(w http.ResponseWriter, r *http.Request) {
@@ -276,6 +292,7 @@ func (s *fakeGalebServer) createVirtualhost(w http.ResponseWriter, r *http.Reque
 	s.idCounter++
 	virtualhost.ID = s.idCounter
 	virtualhost.Links.Self.Href = fmt.Sprintf("http://%s%s/%d", r.Host, r.URL.String(), virtualhost.ID)
+	virtualhost.VirtualHostGroup = fmt.Sprintf("%s/virtualhostgroup/%s", virtualhost.Links.Self.Href, s.idCounter)
 	s.virtualhosts[strconv.Itoa(virtualhost.ID)] = &virtualhost
 	w.Header().Set("Location", virtualhost.Links.Self.Href)
 	w.WriteHeader(http.StatusCreated)
